@@ -87,7 +87,7 @@ class LeftNavigator extends StatelessWidget {
           iconPath: 'lib/icons/64_h.png',
           label: 'Home',
           route: AppRoutes.homePage,
-          color: Colors.green,
+          color: Color(0xFF32E6B7),
         ),
         NavigationItem(
           iconPath: 'lib/icons/64_r.png',
@@ -97,21 +97,33 @@ class LeftNavigator extends StatelessWidget {
         ),
         NavigationItem(
           iconPath: 'lib/icons/64_tc.png',
-          label: 'Staff',
+          label: 'Teachers',
           route: AppRoutes.staff,
           color: Colors.yellow,
         ),
         NavigationItem(
           iconPath: 'lib/icons/64_c.png',
-          label: 'Courses',
+          label: 'Subjects',
           route: AppRoutes.courses,
           color: Color.fromARGB(255, 33, 208, 243),
         ),
         NavigationItem(
           iconPath: 'lib/icons/64_g.png',
-          label: 'Distributions',
+          label: 'Groups',
           route: AppRoutes.distributions,
           color: Colors.deepPurple,
+        ),
+        NavigationItem(
+          iconPath: 'lib/icons/64_tg.png',
+          label: 'Teaching',
+          route: AppRoutes.groups_teachers,
+          color: Colors.green,
+        ),
+        NavigationItem(
+          iconPath: 'lib/icons/64_s.png',
+          label: 'Sessions',
+          route: AppRoutes.sessions,
+          color: Color.fromARGB(255, 197, 87, 182),
         ),
       ],
     );

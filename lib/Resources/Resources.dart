@@ -55,7 +55,7 @@ class MainBody extends StatelessWidget {
           },
           child: const CardNav(
             title:"Tutorial Rooms", 
-            subtitle: "150 ROOM",
+            subtitle: "40 ROOM",
             color: Color.fromARGB(255, 230, 175, 91), 
             buttonText:'Show rooms',
             type:'room',
@@ -71,7 +71,7 @@ class MainBody extends StatelessWidget {
           },
           child: const CardNav(
             title:"Labs", 
-            subtitle: "150 ROOM",
+            subtitle: "20 ROOM",
             color: Color.fromARGB(255, 230, 175, 91), 
             buttonText:'Show rooms',
             type:'room',
@@ -92,6 +92,38 @@ class MainBody extends StatelessWidget {
             buttonText:'Show rooms',
             type:'room',
             room_type: 'Amphi',
+          ),
+        ),
+        InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Rooms(type: 'Lab_language',)), 
+            );
+          },
+          child: const CardNav(
+            title:"Language Labs", 
+            subtitle: "10 ROOM",
+            color: Color.fromARGB(255, 230, 175, 91), 
+            buttonText:'Show rooms',
+            type:'room',
+            room_type: 'Lab_language',
+          ),
+        ),
+        InkWell(
+          onTap: () {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (context) => const Rooms(type: 'Lab_circuits',)), 
+            );
+          },
+          child: const CardNav(
+            title:"Circuits Labs", 
+            subtitle: "10 ROOM",
+            color: Color.fromARGB(255, 230, 175, 91), 
+            buttonText:'Show rooms',
+            type:'room',
+            room_type: 'Lab_circuits',
           ),
         ),
       ],

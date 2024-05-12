@@ -9,19 +9,15 @@ class RoomsData {
       rooms.room_id,
       rooms.room_type,
       rooms.session_type,          
-      rooms.room_capacity
+      rooms.room_capacity, 
+      rooms.room_availability
       FROM rooms
     ''');
   }
   static Future insertRoom(Map<String, dynamic> row,) async {
     final database = await Timetable_DB.getDatabase();
-    List<Map<String, dynamic>> result = await database.rawQuery(
-        "SELECT * FROM rooms WHERE room_id = ?", [row['room_id']]);
-    if (result.isEmpty) {
-        await database.insert("rooms", row, conflictAlgorithm: ConflictAlgorithm.replace);
-      } else {
-        throw Exception("Rooms with ID ${row['room_id']} already exists!");
-      }
+    database.insert("rooms", row,
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   static void deleteRoom(String id) async {
@@ -47,12 +43,56 @@ class WorkingDaysData {
         conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
-  static void deleteWorkingDay(int id_day, int id_teacher) async {
+  static void deleteWorkingDay(String id_day, String id_teacher) async {
     final database = await Timetable_DB.getDatabase();
     await database.rawDelete(
       "DELETE FROM working_days WHERE week_day = ? AND teacher_id = ?",[id_day, id_teacher]);
   }
 }
+
+
+// GROUPS TEACHES
+class GroupsTeachersData {
+  static Future<List<Map<String, dynamic>>> getAllGroupsTeachers() async {
+    final database = await Timetable_DB.getDatabase();
+    return database.rawQuery('''SELECT 
+      groups_teachers.group_id,
+      groups_teachers.teacher_id
+      FROM groups_teachers
+    ''');
+  }
+  
+  static Future insertGroupsTeachers(Map<String, dynamic> row) async {
+    final database = await Timetable_DB.getDatabase();
+    
+    // Check if the record already exists
+    final List<Map<String, dynamic>> existingRecords = await database.rawQuery(
+      "SELECT * FROM groups_teachers WHERE group_id = ? AND teacher_id = ?",
+      [row['group_id'], row['teacher_id']]
+    );
+    
+    if (existingRecords.isNotEmpty) {
+      print('Row already exists');
+      return; // Exit the method if the record already exists
+    }
+
+    // Insert the record if it doesn't exist
+    await database.insert(
+      "groups_teachers",
+      row,
+      conflictAlgorithm: ConflictAlgorithm.replace,
+    );
+  }
+
+  static void deleteGroupsTeachers(String id_teacher) async {
+    final database = await Timetable_DB.getDatabase();
+    await database.rawDelete(
+      "DELETE FROM groups_teachers WHERE teacher_id = ?",
+      [id_teacher],
+    );
+  }
+}
+
 
 
 //TEACHER
@@ -63,19 +103,17 @@ class TeachersData {
       teachers.teacher_id,
       teachers.teacher_name,
       teachers.teacher_grade,
-      teachers.field
+      teachers.teacher_availability,
+      teachers.field,
+      teachers.priority, 
+      teachers.pereferred_period
       FROM teachers
     ''');
   }
   static Future insertTeacher(Map<String, dynamic> row,) async {
     final database = await Timetable_DB.getDatabase();
-    List<Map<String, dynamic>> result = await database.rawQuery(
-        "SELECT * FROM teachers WHERE teacher_id = ?", [row['teacher_id']]);
-    if (result.isEmpty) {
-        await database.insert("teachers", row, conflictAlgorithm: ConflictAlgorithm.replace);
-      } else {
-        throw Exception("Teacher with ID ${row['teacher_id']} already exists!");
-      }
+    database.insert("teachers", row,
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   static void deleteTeacher(String id) async {
@@ -100,17 +138,16 @@ class SubjectsData {
       FROM subjects
     ''');
   }
+static Future insertSubject(Map<String, dynamic> row,) async {
+    print(row);
+    try {
+        final database = await Timetable_DB.getDatabase();
+        database.insert("subjects", row, conflictAlgorithm: ConflictAlgorithm.replace);
+    } catch(e) {
+        print('###${e}');
+    }
+}
 
-  static Future insertSubject(Map<String, dynamic> row,) async {
-    final database = await Timetable_DB.getDatabase();
-    List<Map<String, dynamic>> result = await database.rawQuery(
-        "SELECT * FROM subjects WHERE subject_id = ?", [row['subject_id']]);
-    if (result.isEmpty) {
-        await database.insert("subjects", row, conflictAlgorithm: ConflictAlgorithm.replace);
-      } else {
-        throw Exception("Subject with ID ${row['subject_id']} already exists!");
-      }
-  }
 
   static void deleteSubject(String id) async {
     final database = await Timetable_DB.getDatabase();
@@ -133,21 +170,46 @@ class GroupsData {
       FROM groups
     ''');
   }
-
-  static Future<void> insertGroup(Map<String, dynamic> row,) async {
+  static Future insertGroup(Map<String, dynamic> row,) async {
     final database = await Timetable_DB.getDatabase();
-    List<Map<String, dynamic>> result = await database.rawQuery(
-      "SELECT * FROM groups WHERE group_id = ?", [row['group_id']]);
-    if (result.isEmpty) {
-      await database.insert("groups", row, conflictAlgorithm: ConflictAlgorithm.replace);
-    } else {
-      throw Exception("Group with ID ${row['group_id']} already exists!");
-    }
+    database.insert("groups", row,
+        conflictAlgorithm: ConflictAlgorithm.replace);
   }
 
   static void deleteGroups(String id) async {
     final database = await Timetable_DB.getDatabase();
     await database.rawDelete(
       "DELETE FROM groups WHERE group_id = ? ",[id]);
+  }
+}
+
+
+//SESSIONS
+class SessionsData {
+  static Future<List<Map<String, dynamic>>> getSessions() async {
+    final database = await Timetable_DB.getDatabase();
+    return database.rawQuery('''SELECT 
+      sessions.session_id,
+      sessions.subject_id,
+      sessions.session_type,
+      sessions.nb_of_sessions_per_week
+      FROM sessions
+    ''');
+  }
+static Future insertSession(Map<String, dynamic> row,) async {
+    print(row);
+    try {
+        final database = await Timetable_DB.getDatabase();
+        database.insert("sessions", row, conflictAlgorithm: ConflictAlgorithm.replace);
+    } catch(e) {
+        print('###${e}');
+    }
+}
+
+
+  static void deleteSession(String id) async {
+    final database = await Timetable_DB.getDatabase();
+    await database.rawDelete(
+      "DELETE FROM sessions WHERE session_id = ? ",[id]);
   }
 }

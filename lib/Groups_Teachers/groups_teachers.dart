@@ -5,17 +5,17 @@ import 'package:flutter_application_db_local/database/helper_fct.dart';
 import '/widgets/Dialogs.dart';
 import '../widgets/leftnavigator.dart'; // Assuming you have this widget defined
 
-class Staff extends StatefulWidget {
-  const Staff({
+class GroupsTeachers extends StatefulWidget {
+  const GroupsTeachers({
     super.key, 
   });
   @override
-  State<Staff> createState() => _StaffState();
+  State<GroupsTeachers> createState() => _groupsTeachersState();
 }
 
-class _StaffState extends State<Staff> {
+class _groupsTeachersState extends State<GroupsTeachers> {
   List<Map<String, dynamic>> teacherData = [];
-  Map<String, List<String>> teacherWorkingDays = {};
+  Map<String, List<String>> teachersGroups = {};
 
   @override
   void initState() {
@@ -50,54 +50,33 @@ class _StaffState extends State<Staff> {
           Container(
             height: MediaQuery.of(context).size.height * 0.8,
             padding: EdgeInsets.fromLTRB(
-                MediaQuery.of(context).size.height * 0.05,
+                MediaQuery.of(context).size.height * 0.5,
                 MediaQuery.of(context).size.height * 0.1,
                 0,
                 0),
             child: Expanded(
               child: SingleChildScrollView(
                 child: DataTable(
-                  columnSpacing: 30,
                   dataRowHeight: 100,
                   columns: const <DataColumn>[
                     DataColumn(
                         label: Text('Teacher Id',
-                            style: TextStyle(color: Colors.yellow, fontSize: 13),)),
+                            style: TextStyle(color: Colors.green))),    
                     DataColumn(
-                        label: Text('Teacher Name',
-                            style: TextStyle(color: Colors.yellow, fontSize: 13))),
-                    DataColumn(
-                        label: Text('Teacher Grade',
-                            style: TextStyle(color: Colors.yellow, fontSize: 13))),
-                    DataColumn(
-                        label: Text('Field',
-                            style: TextStyle(color: Colors.yellow, fontSize: 13))),
-                    DataColumn(
-                        label: Text('Priority',
-                            style: TextStyle(color: Colors.yellow, fontSize: 13))),     
-                    DataColumn(
-                        label: Text('Preferred Period',
-                            style: TextStyle(color: Colors.yellow, fontSize: 13))),     
-                    DataColumn(
-                        label: Text('Working Days',
-                            style: TextStyle(color: Colors.yellow, fontSize: 13))),
+                        label: Text('Groups Ids',
+                            style: TextStyle(color: Colors.green))),
                     DataColumn(
                         label: Text(' ',
-                            style: TextStyle(color: Colors.yellow, fontSize: 13))),
+                            style: TextStyle(color: Colors.green))),
                   ],
                   
                   rows: teacherData.map(
                     (teacher) => DataRow(
                       cells: <DataCell>[
-                        DataCell(Text(teacher['teacher_id'], style: const TextStyle(color: Colors.white, fontSize: 13))),
-                        DataCell(Text(teacher['teacher_name'], style: const TextStyle(color: Colors.white, fontSize: 13))),
-                        DataCell(Text(teacher['teacher_grade'], style: const TextStyle(color: Colors.white, fontSize: 13))),
-                        DataCell(Text(teacher['field'], style: const TextStyle(color: Colors.white, fontSize: 13))),
-                        DataCell(Text(teacher['priority'], style: const TextStyle(color: Colors.white, fontSize: 13))),
-                        DataCell(Text(teacher['pereferred_period'], style: const TextStyle(color: Colors.white, fontSize: 13))),
+                        DataCell(Text(teacher['teacher_id'], style: const TextStyle(color: Colors.white))),
                         DataCell(
                           FutureBuilder<List<Map<String, dynamic>>>(
-                            future: WorkingDaysData.getAllWorkingDays(),
+                            future: GroupsTeachersData.getAllGroupsTeachers(),
                             builder: (context, snapshot) {
                               if (snapshot.connectionState == ConnectionState.waiting) {
                                 return CircularProgressIndicator(); // Placeholder while loading
@@ -105,11 +84,16 @@ class _StaffState extends State<Staff> {
                                 return Text('Error: ${snapshot.error}');
                               } else {
                                 // Filter working days for the current teacher
-                                List<String> workingDays = snapshot.data!
-                                    .where((day) => day['teacher_id'] == teacher['teacher_id'])
-                                    .map((day) => day['week_day'].toString())
+                                List<String> groups = snapshot.data!
+                                    .where((group) => group['teacher_id'] == teacher['teacher_id'])
+                                    .map((group) => group['group_id'].toString())
                                     .toList();
-                                return Text(workingDays.join('\n '), style: const TextStyle(color: Colors.white));
+                                
+                                if (groups.isEmpty) {
+                                  return Text('none', style: const TextStyle(color: Colors.white));
+                                } else {
+                                  return Text(groups.join(', '), style: const TextStyle(color: Colors.white));
+                                }
                               }
                             },
                           ),
@@ -119,7 +103,8 @@ class _StaffState extends State<Staff> {
                             color: Colors.white,
                             icon: Icon(Icons.delete),
                             onPressed: () {
-                              TeachersData.deleteTeacher(teacher['teacher_id']);
+                              print(teacher['teacher_id']);
+                              GroupsTeachersData.deleteGroupsTeachers(teacher['teacher_id']);
                               _fetchTeachers();
                             },
                           ),
@@ -135,10 +120,10 @@ class _StaffState extends State<Staff> {
       ),
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
-          await teacherAddRowDialog(context);
+          await teachergroupAddRowDialog(context);
           _fetchTeachers();
         },
-        backgroundColor: const Color.fromARGB(255, 255, 242, 126),
+        backgroundColor: Color.fromARGB(255, 143, 226, 148),
         child: const Icon(Icons.add,),
       ),
       floatingActionButtonLocation: FloatingActionButtonLocation.endFloat,

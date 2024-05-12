@@ -29,23 +29,36 @@ class Timetable_DB {
             room_id TEXT,
             room_type TEXT,
             session_type TEXT,
-            room_capacity INTEGER
+            room_capacity INTEGER,
+            room_availability TEXT
           )
-          ''');
+          '''); 
+          // room_type (Amphi, Tuto, Lab, Lab_language, Lab_circuits)
+          // session_type (lecture, tuto, lab, lab_language, lab_ciruits)
+          // room_availability (True, False)
         myMTH.execute('''
           CREATE TABLE working_days(
             teacher_id TEXT,
             week_day TEXT
           )
           ''');
+        // week_day (1: Sunday, ..., 7: Saturday)
         myMTH.execute('''
           CREATE TABLE teachers(
             teacher_id TEXT,
             teacher_name TEXT,
             teacher_grade TEXT,
-            field TEXT
+            teacher_availability TEXT,
+            field TEXT,
+            priority TEXT, 
+            pereferred_period TEXT
           )
           ''');
+        // teacher_grade (Professor, Assistant Associate Professor)
+        // field (Organizational Psychology, Computer Science, Statistics, Mathematics, English, Business & Entrepreneurship)
+        // priority()
+        // pereferred_period (m: morning, f: afternoon)
+        // teacher_availability (True, False)
         myMTH.execute('''
           CREATE TABLE subjects(
             subject_id TEXT,
@@ -56,6 +69,8 @@ class Timetable_DB {
             semester INTEGER
           )
           ''');
+          // subject_category (Fundamental, Methodologic, Discovery, Transversal)
+          // field (Organizational Psychology, Computer Science, Statistics, Mathematics, English, Business & Entrepreneurship)
         myMTH.execute('''
           CREATE TABLE groups(
             group_id TEXT,	
@@ -65,6 +80,21 @@ class Timetable_DB {
             student_number INTEGER
           )
           ''');
+        myMTH.execute('''
+          CREATE TABLE groups_teachers(
+            group_id TEXT,	
+            teacher_id TEXT
+          )
+          ''');
+          myMTH.execute('''
+          CREATE TABLE sessions (
+            session_id TEXT,	
+            subject_id TEXT,
+            session_type TEXT,
+            nb_of_sessions_per_week TEXT
+          )
+          ''');
+          // Session_type (Lecture, Lab, Language Lab, Circuit Lab, Tutorial)
       },
       version: _database_version,
       onUpgrade: (database, oldVersion, newVersion) {},

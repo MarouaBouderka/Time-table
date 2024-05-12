@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import '/Courses/Subjects.dart';
+import '../Courses/Subjects.dart';
 import '/widgets/Dialogs.dart';
 import '/Resources/Rooms.dart';
 

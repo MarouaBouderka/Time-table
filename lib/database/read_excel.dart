@@ -3,6 +3,10 @@ import 'dart:io';
 import 'package:excel/excel.dart';
 
 Future<List> readExcelFile(String path, String sheet) async {
+  print('PAAATH');
+  print(path);
+  print('Sheeet');
+  print(sheet);
   try {
     String excelFilePath = path; 
     String sheetName = sheet; 

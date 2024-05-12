@@ -304,7 +304,8 @@ Future<void> roomsAddRowDialog(BuildContext context, String type) async {
                               'room_id': id,
                               'room_type':type,
                               'session_type':session,
-                              'room_capacity': capacity
+                              'room_capacity': capacity,
+                              'room_availability':'False'
                             };
                             try{await RoomsData.insertRoom(roomData);}
                             catch(e){ScaffoldMessenger.of(context).showSnackBar(
@@ -332,7 +333,192 @@ Future<void> roomsAddRowDialog(BuildContext context, String type) async {
   );
 }
 
+Future<void> teachergroupAddRowDialog(BuildContext context) async {
+    List<String> teacherIds = [' '];
+    if((await TeachersData.getTeacher()).map((result) => result['teacher_id'] as String).toList().isNotEmpty)
+      teacherIds = (await TeachersData.getTeacher()).map((result) => result['teacher_id'] as String).toList();
+    List<String> groupIds = [' '];
+    if((await GroupsData.getGroups()).map((result) => result['group_id'] as String).toList().isNotEmpty)
+      groupIds = (await GroupsData.getGroups()).map((result) => result['group_id'] as String).toList();
+    
+    String? selectedteacher = teacherIds.first;
+    String? selectedgroup = groupIds.first;
 
+    // ignore: use_build_context_synchronously
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+            title: const Text(
+              'New Row',
+              style: TextStyle(color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  DropdownButtonFormField2<String>(
+                    isExpanded: true,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    hint: const Text(
+                      'Teacher Id',
+                      style: TextStyle(fontSize: 14, color: Colors.white),
+                    ),
+                    items: teacherIds
+                        .map((item) => DropdownMenuItem<String>(
+                              value: item,
+                              child: Text(
+                                item,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ))
+                        .toList(),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select a teacher.';
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      selectedteacher = value.toString();
+                    },
+                    onSaved: (value) {
+                      selectedteacher = value.toString();
+                    },
+                    buttonStyleData: const ButtonStyleData(
+                      padding: EdgeInsets.only(right: 8),
+                    ),
+                    iconStyleData: const IconStyleData(
+                      icon: Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.white,
+                      ),
+                      iconSize: 24,
+                    ),
+                    dropdownStyleData: DropdownStyleData(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    menuItemStyleData: const MenuItemStyleData(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  DropdownButtonFormField2<String>(
+                    isExpanded: true,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    hint: const Text(
+                      'Group Id',
+                      style: TextStyle(fontSize: 14, color: Colors.white),
+                    ),
+                    items: groupIds
+                        .map((item) => DropdownMenuItem<String>(
+                              value: item,
+                              child: Text(
+                                item,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ))
+                        .toList(),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select a group.';
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      selectedgroup = value.toString();
+                    },
+                    onSaved: (value) {
+                      selectedgroup = value.toString();
+                    },
+                    buttonStyleData: const ButtonStyleData(
+                      padding: EdgeInsets.only(right: 8),
+                    ),
+                    iconStyleData: const IconStyleData(
+                      icon: Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.white,
+                      ),
+                      iconSize: 24,
+                    ),
+                    dropdownStyleData: DropdownStyleData(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    menuItemStyleData: const MenuItemStyleData(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (selectedgroup == null ||
+                          selectedteacher == null ) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please fill all the fields.'),
+                              ),
+                            );
+                            return;
+                          }
+                        // Retrieve values from text controllers
+                        String? group_id = selectedgroup;
+                        String? teacher_id = selectedteacher;
+                        // Create a map representing the subject data
+                        Map<String, dynamic> gt = {
+                          'teacher_id': teacher_id,
+                          'group_id': group_id,
+                        };
+                        try{
+                          await GroupsTeachersData.insertGroupsTeachers(gt);
+                        }
+                        catch(e){ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Failed'),
+                          ),
+                        );}                                
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.green,
+                      ),
+                      child: const Text('Add',
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                  )
+                ]
+              )
+            )
+        );
+      }
+    );
+
+    
+}
 
 
 Future<void> teacherAddRowDialog(BuildContext context) async {
@@ -343,7 +529,12 @@ Future<void> teacherAddRowDialog(BuildContext context) async {
     String? selectedfield = fields.first;
 
     List<String> grades = ['Professor', 'Assistant Professor', 'Associate Professor']; 
+    List<String> period = ['Morning', 'Afternoon']; 
+    List<String> prior = ['High', 'Low'];
+
     String? selectedgrade = fields.first;
+    String? selectedperiod = period.first;
+    String? selectedpriority = prior.first;
 
     final List<String> days = [
       'Sunday',
@@ -368,24 +559,26 @@ Future<void> teacherAddRowDialog(BuildContext context) async {
                 children: [
                   Container(
                     width: double.infinity,
-                    padding: const EdgeInsets.all(20),
+                    padding: const EdgeInsets.all(10),
                     child: Form(
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          const SizedBox(height: 20),
                           TextFormFieldWidget(
                             labelText: 'Identifier',
                             color: const Color.fromARGB(255, 255, 242, 126),
                             controller: id_controller,
                           ),
+
                           const SizedBox(height: 10),
+                          
                           TextFormFieldWidget(
                             labelText: 'Teacher Name',
                             color: const Color.fromARGB(255, 255, 242, 126),
                             controller: name_controller,
                           ),
-                          const SizedBox(height: 20),
+
+                          const SizedBox(height: 10),
                           
                           DropdownButtonFormField2<String>(
                             isExpanded: true,
@@ -442,9 +635,8 @@ Future<void> teacherAddRowDialog(BuildContext context) async {
                               padding: EdgeInsets.symmetric(horizontal: 16),
                             ),
                           ),
-
-                          const SizedBox(height: 20),
-
+                          
+                          const SizedBox(height: 10),
 
                           DropdownButtonFormField2<String>(
                             isExpanded: true,
@@ -502,7 +694,124 @@ Future<void> teacherAddRowDialog(BuildContext context) async {
                             ),
                           ),
 
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 10),
+
+                          DropdownButtonFormField2<String>(
+                            isExpanded: true,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                            ),
+                            hint: const Text(
+                              'Priority',
+                              style: TextStyle(fontSize: 14, color: Colors.white),
+                            ),
+                            items: prior
+                                .map((item) => DropdownMenuItem<String>(
+                                      value: item,
+                                      child: Text(
+                                        item,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ))
+                                .toList(),
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please select an option.';
+                              }
+                              return null;
+                            },
+                            onChanged: (value) {
+                              selectedpriority = value.toString();
+                            },
+                            onSaved: (value) {
+                              selectedpriority = value.toString();
+                            },
+                            buttonStyleData: const ButtonStyleData(
+                              padding: EdgeInsets.only(right: 8),
+                            ),
+                            iconStyleData: const IconStyleData(
+                              icon: Icon(
+                                Icons.arrow_drop_down,
+                                color: Colors.white,
+                              ),
+                              iconSize: 24,
+                            ),
+                            dropdownStyleData: DropdownStyleData(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                            menuItemStyleData: const MenuItemStyleData(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                            ),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          DropdownButtonFormField2<String>(
+                            isExpanded: true,
+                            decoration: InputDecoration(
+                              contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                              border: OutlineInputBorder(
+                                borderRadius: BorderRadius.circular(5),
+                              ),
+                            ),
+                            hint: const Text(
+                              'Preferred Period',
+                              style: TextStyle(fontSize: 14, color: Colors.white),
+                            ),
+                            items: period
+                                .map((item) => DropdownMenuItem<String>(
+                                      value: item,
+                                      child: Text(
+                                        item,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ))
+                                .toList(),
+                            validator: (value) {
+                              if (value == null) {
+                                return 'Please select an option.';
+                              }
+                              return null;
+                            },
+                            onChanged: (value) {
+                              selectedperiod = value.toString();
+                            },
+                            onSaved: (value) {
+                              selectedperiod = value.toString();
+                            },
+                            buttonStyleData: const ButtonStyleData(
+                              padding: EdgeInsets.only(right: 8),
+                            ),
+                            iconStyleData: const IconStyleData(
+                              icon: Icon(
+                                Icons.arrow_drop_down,
+                                color: Colors.white,
+                              ),
+                              iconSize: 24,
+                            ),
+                            dropdownStyleData: DropdownStyleData(
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(15),
+                              ),
+                            ),
+                            menuItemStyleData: const MenuItemStyleData(
+                              padding: EdgeInsets.symmetric(horizontal: 16),
+                            ),
+                          ),
+
+
+                          const SizedBox(height: 10),
 
                           Container(
                             width: 200,
@@ -588,7 +897,8 @@ Future<void> teacherAddRowDialog(BuildContext context) async {
                             ),
                           ),
 
-                          const SizedBox(height: 20),
+                          const SizedBox(height: 10),
+
                           Center(
                             child: ElevatedButton(
                               onPressed: () async {
@@ -596,6 +906,8 @@ Future<void> teacherAddRowDialog(BuildContext context) async {
                                   name_controller.text.isEmpty ||
                                   selectedfield == null ||
                                   selectedgrade == null ||
+                                  selectedperiod == null ||
+                                  selectedpriority == null||
                                   selectedDays.isEmpty) {
                                     ScaffoldMessenger.of(context).showSnackBar(
                                       const SnackBar(
@@ -609,13 +921,18 @@ Future<void> teacherAddRowDialog(BuildContext context) async {
                                 String name = name_controller.text;
                                 String? field = selectedfield;
                                 String? grade = selectedgrade;
+                                String? pref_period = selectedperiod;
+                                String? priority = selectedpriority;
 
                                 // Create a map representing the subject data
                                 Map<String, dynamic> teacherData = {
                                   'teacher_id': id,
                                   'teacher_name': name,
                                   'teacher_grade': grade,
-                                  'field': field, 
+                                  'teacher_availability': 'True',
+                                  'field': field,
+                                  'priority': priority, 
+                                  'pereferred_period': pref_period,
                                 };
                                 try{
                                   await TeachersData.insertTeacher(teacherData);
@@ -718,3 +1035,210 @@ Future<void> teacherAddRowDialog(BuildContext context) async {
       },
     );
   }
+
+
+
+
+
+
+
+Future<void> sessionAddRowDialog(BuildContext context) async {
+    List<String> subjectIds = [' '];
+    if((await SubjectsData.getSubject()).map((result) => result['subject_id'] as String).toList().isNotEmpty)
+      subjectIds = (await SubjectsData.getSubject()).map((result) => result['subject_id'] as String).toList();
+
+    List<String> session_type = ['Lecture', 'Lab', 'Language Lab', 'Circuit Lab', 'Tutorial'];
+
+    TextEditingController id_session_controller = TextEditingController();
+    TextEditingController nb_of_sess_controller = TextEditingController();
+    String? selectedSub = subjectIds.first;
+    String? selectedtype = session_type.first;
+
+    // ignore: use_build_context_synchronously
+    return showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+            title: const Text(
+              'New Session',
+              style: TextStyle(color: Colors.white),
+              textAlign: TextAlign.center,
+            ),
+            content: SingleChildScrollView(
+              child: Column(
+                children: [
+                  TextFormFieldWidget(labelText: 'Identifier', color: Color.fromARGB(255, 203, 139, 195), controller: id_session_controller,),
+                  
+                  const SizedBox(height: 10),
+                  
+                  DropdownButtonFormField2<String>(
+                    isExpanded: true,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    hint: const Text(
+                      'Subject Id',
+                      style: TextStyle(fontSize: 14, color: Colors.white),
+                    ),
+                    items: subjectIds
+                        .map((item) => DropdownMenuItem<String>(
+                              value: item,
+                              child: Text(
+                                item,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ))
+                        .toList(),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select a subject.';
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      selectedSub = value.toString();
+                    },
+                    onSaved: (value) {
+                      selectedSub = value.toString();
+                    },
+                    buttonStyleData: const ButtonStyleData(
+                      padding: EdgeInsets.only(right: 8),
+                    ),
+                    iconStyleData: const IconStyleData(
+                      icon: Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.white,
+                      ),
+                      iconSize: 24,
+                    ),
+                    dropdownStyleData: DropdownStyleData(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    menuItemStyleData: const MenuItemStyleData(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  DropdownButtonFormField2<String>(
+                    isExpanded: true,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    hint: const Text(
+                      'Session Type',
+                      style: TextStyle(fontSize: 14, color: Colors.white),
+                    ),
+                    items: session_type
+                        .map((item) => DropdownMenuItem<String>(
+                              value: item,
+                              child: Text(
+                                item,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ))
+                        .toList(),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select a type.';
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      selectedtype = value.toString();
+                    },
+                    onSaved: (value) {
+                      selectedtype = value.toString();
+                    },
+                    buttonStyleData: const ButtonStyleData(
+                      padding: EdgeInsets.only(right: 8),
+                    ),
+                    iconStyleData: const IconStyleData(
+                      icon: Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.white,
+                      ),
+                      iconSize: 24,
+                    ),
+                    dropdownStyleData: DropdownStyleData(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    menuItemStyleData: const MenuItemStyleData(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
+                  TextFormFieldWidget(labelText: 'Nb of sessions /week', color: Color.fromARGB(255, 203, 139, 195), controller: nb_of_sess_controller,),
+                  const SizedBox(height: 10),
+
+                  Center(
+                    child: ElevatedButton(
+                      onPressed: () async {
+                        if (selectedSub == null ||
+                          nb_of_sess_controller.value == null ||
+                          id_session_controller.value == null ||
+                          selectedtype == null ) {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              const SnackBar(
+                                content: Text('Please fill all the fields.'),
+                              ),
+                            );
+                            return;
+                          }
+                        // Retrieve values from text controllers
+                        String? session_id= id_session_controller.text;
+                        String? subject_id = selectedSub;
+                        String? nb_sess = nb_of_sess_controller.text;
+                        String? session_type = selectedtype;
+                        // Create a map representing the subject data
+                        Map<String, dynamic> session = {
+                          'session_id': session_id,
+                          'subject_id': subject_id,
+                          'session_type': nb_sess,
+                          'nb_of_sessions_per_week': session_type
+                        };
+                        try{
+                          await SessionsData.insertSession(session);
+                        }
+                        catch(e){ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text('Failed'),
+                          ),
+                        );}                                
+                        Navigator.of(context).pop();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Color.fromARGB(255, 197, 87, 182),
+                      ),
+                      child: const Text('Add',
+                          style: TextStyle(color: Colors.white)),
+                    ),
+                  )
+                ]
+              )
+            )
+        );
+      }
+    );
+
+    
+}

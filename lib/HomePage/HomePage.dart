@@ -1,6 +1,8 @@
 // ignore_for_file: must_be_immutable, use_build_context_synchronously
 import 'package:flutter/material.dart';
+import 'package:flutter_application_db_local/Sessions/sessions.dart';
 import 'package:flutter_application_db_local/database/read_excel.dart';
+import 'package:flutter_application_db_local/widgets/welcome.dart';
 import '../TimeTables/timetable.dart';
 import '../database/helper_fct.dart';
 import '../widgets/card_widget.dart';
@@ -13,6 +15,7 @@ class HomePage extends StatefulWidget {
   @override
   State<HomePage> createState() => _HomePageState();
 }
+
 
 class _HomePageState extends State<HomePage> {
   @override
@@ -34,8 +37,7 @@ class _HomePageState extends State<HomePage> {
             child: Padding(
               padding: const EdgeInsets.only(top: 0.0, left: 20),
               child: Row(
-                mainAxisAlignment:
-                    MainAxisAlignment.spaceEvenly, 
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children: [
                   Expanded(
                     child: MainBody(),
@@ -46,9 +48,16 @@ class _HomePageState extends State<HomePage> {
           ),
         ],
       ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          showWelcomeDialog(context);
+        },
+        child: Icon(Icons.info, size: 50,),
+      ),
     );
   }
 }
+
 
 class Tables extends StatelessWidget {
   @override
@@ -76,6 +85,12 @@ class MainBody extends StatelessWidget {
   TextEditingController group_path = TextEditingController();
   TextEditingController group_sheet = TextEditingController();
 
+  TextEditingController session_path = TextEditingController();
+  TextEditingController session_sheet = TextEditingController();
+
+  TextEditingController teaching_path = TextEditingController();
+  TextEditingController teaching_sheet = TextEditingController();
+
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
@@ -84,7 +99,7 @@ class MainBody extends StatelessWidget {
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          'TIME TABLE GENERATOR',
+          'Time Table Generator',
           style: TextStyle(
               fontSize: 40,
               fontWeight: FontWeight.bold,
@@ -92,7 +107,7 @@ class MainBody extends StatelessWidget {
         ),
         const SizedBox(height: 20),
         const Text(
-          'Scheduling has never been easier.',
+          '',
           style: TextStyle(
             fontFamily: "Roboto",
             fontSize: 16,
@@ -100,7 +115,6 @@ class MainBody extends StatelessWidget {
             color: Color.fromARGB(255, 219, 219, 219)
           ),
         ),
-        const SizedBox(height: 100),
         Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -115,7 +129,7 @@ class MainBody extends StatelessWidget {
                     border: Border.all(color: Colors.black,width: 1)
                   ),
                   height: 40,
-                  width: 350, 
+                  width: 500, 
                   child: TextFormField(
                     controller: room_path,              
                     decoration: const InputDecoration(  
@@ -168,7 +182,7 @@ class MainBody extends StatelessWidget {
                     border: Border.all(color: Colors.black,width: 1)
                   ),
                   height: 40,
-                  width: 350, 
+                  width: 500, 
                   child: TextFormField( 
                     controller: teacher_path,             
                     decoration: const InputDecoration(  
@@ -221,7 +235,7 @@ class MainBody extends StatelessWidget {
                     border: Border.all(color: Colors.black,width: 1)
                   ),
                   height: 40,
-                  width: 350, 
+                  width: 500, 
                   child: TextFormField(         
                     controller: working_days_path,     
                     decoration: const InputDecoration(  
@@ -263,7 +277,7 @@ class MainBody extends StatelessWidget {
                   ),
                 ),
               ],
-            ),         
+            ),     
             Row(
               children: [
                 Container(
@@ -274,7 +288,113 @@ class MainBody extends StatelessWidget {
                     border: Border.all(color: Colors.black,width: 1)
                   ),
                   height: 40,
+                  width: 500, 
+                  child: TextFormField(         
+                    controller: group_path,     
+                    decoration: const InputDecoration(  
+                      labelText: 'Groups xlsx File Path',
+                      border:InputBorder.none,
+                      floatingLabelBehavior: FloatingLabelBehavior.never
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter path';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(width:5),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(10,5,5,5),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.black,width: 1)
+                  ),
+                  height: 40,
                   width: 350, 
+                  child: TextFormField(      
+                    controller: group_sheet,        
+                    decoration: const InputDecoration(  
+                      labelText: 'Sheet',
+                      border:InputBorder.none,
+                      floatingLabelBehavior: FloatingLabelBehavior.never
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter sheet';
+                      }
+                      return null;
+                    },    
+                  ),
+                ),
+              ],
+            ),    
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.fromLTRB(10,5,5,5),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.black,width: 1)
+                  ),
+                  height: 40,
+                  width: 500, 
+                  child: TextFormField(         
+                    controller: teaching_path,     
+                    decoration: const InputDecoration(  
+                      labelText: 'Teaching xlsx File Path',
+                      border:InputBorder.none,
+                      floatingLabelBehavior: FloatingLabelBehavior.never
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter path';
+                      }
+                      return null;
+                    },
+                  ),
+                ),
+                const SizedBox(width:5),
+                Container(
+                  padding: const EdgeInsets.fromLTRB(10,5,5,5),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.black,width: 1)
+                  ),
+                  height: 40,
+                  width: 350, 
+                  child: TextFormField(      
+                    controller: teaching_sheet,        
+                    decoration: const InputDecoration(  
+                      labelText: 'Sheet',
+                      border:InputBorder.none,
+                      floatingLabelBehavior: FloatingLabelBehavior.never
+                    ),
+                    validator: (value) {
+                      if (value!.isEmpty) {
+                        return 'Please enter sheet';
+                      }
+                      return null;
+                    },    
+                  ),
+                ),
+              ],
+            ),                
+            Row(
+              children: [
+                Container(
+                  padding: const EdgeInsets.fromLTRB(10,5,5,5),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    borderRadius: BorderRadius.circular(10),
+                    border: Border.all(color: Colors.black,width: 1)
+                  ),
+                  height: 40,
+                  width: 500, 
                   child: TextFormField(  
                     controller: subject_path,            
                     decoration: const InputDecoration(
@@ -327,11 +447,11 @@ class MainBody extends StatelessWidget {
                     border: Border.all(color: Colors.black,width: 1)
                   ),
                   height: 40,
-                  width: 350, 
-                  child: TextFormField(         
-                    controller: group_path,     
-                    decoration: const InputDecoration(  
-                      labelText: 'Groups xlsx File Path',
+                  width: 500, 
+                  child: TextFormField(  
+                    controller: session_path,            
+                    decoration: const InputDecoration(
+                      labelText: 'Sessions xlsx File Path',
                       border:InputBorder.none,
                       floatingLabelBehavior: FloatingLabelBehavior.never
                     ),
@@ -353,8 +473,8 @@ class MainBody extends StatelessWidget {
                   ),
                   height: 40,
                   width: 350, 
-                  child: TextFormField(      
-                    controller: group_sheet,        
+                  child: TextFormField(  
+                    controller: session_sheet,            
                     decoration: const InputDecoration(  
                       labelText: 'Sheet',
                       border:InputBorder.none,
@@ -362,14 +482,14 @@ class MainBody extends StatelessWidget {
                     ),
                     validator: (value) {
                       if (value!.isEmpty) {
-                        return 'Please enter sheet';
+                        return 'Please enter path';
                       }
                       return null;
                     },    
                   ),
                 ),
               ],
-            ),        
+            ),      
             const SizedBox(width: 10),
             Padding(
               padding: const EdgeInsets.only(top: 8.0, left: 0),
@@ -378,7 +498,7 @@ class MainBody extends StatelessWidget {
                 label: "Upload Data",
 
                 onPressed: () async{
-
+                  print(room_path.text);
                   List<dynamic> rooms = await readExcelFile(room_path.text, room_sheet.text);
                   // Loop through rows in the sheet and insert data into the SQLite database
                   for (var i = 1; i < rooms.length; i++) {
@@ -388,6 +508,7 @@ class MainBody extends StatelessWidget {
                       'room_type': row[1].value.toString(),
                       'session_type': row[2].value.toString(),
                       'room_capacity': int.tryParse(row[3].value.toString())??0,
+                      'room_availability':'False',
                     };
                     await RoomsData.insertRoom(rowData);
                   }
@@ -400,7 +521,10 @@ class MainBody extends StatelessWidget {
                       'teacher_id': row[0].value.toString(),
                       'teacher_name': row[1].value.toString(),
                       'teacher_grade': row[2].value.toString(),
+                      'teacher_availability': 'True',
                       'field': row[3].value.toString(),
+                      'priority': row[4].value.toString(), 
+                      'pereferred_period': row[5].value.toString(),
                     };
                     await TeachersData.insertTeacher(rowData);
                   }
@@ -414,6 +538,31 @@ class MainBody extends StatelessWidget {
                       'week_day': row[1].value.toString(),
                     };
                     await WorkingDaysData.insertWorkingDay(rowData);
+                  }
+
+                  List<dynamic> groups = await readExcelFile(group_path.text, group_sheet.text);
+                  // Loop through rows in the sheet and insert data into the SQLite database
+                  for (var i = 1; i < groups.length; i++) {
+                    var row = groups[i];
+                    Map<String, dynamic> rowData = {
+                      'group_id': row[0].value.toString(),
+                      'group_year': int.tryParse(row[1].value.toString())??0,
+                      'group_section': int.tryParse(row[2].value.toString())??0,
+                      'group_number': int.tryParse(row[3].value.toString())??0,
+                      'student_number': int.tryParse(row[4].value.toString())??0,
+                    };
+                    await GroupsData.insertGroup(rowData);
+                  }
+
+                  List<dynamic> teaching = await readExcelFile(teaching_path.text, teaching_path.text);
+                  // Loop through rows in the sheet and insert data into the SQLite database
+                  for (var i = 1; i < teaching.length; i++) {
+                    var row = teaching[i];
+                    Map<String, dynamic> rowData = {
+                      'teacher_id': row[0].value.toString(),
+                      'group_id': row[1].value.toString(),
+                    };
+                    await GroupsTeachersData.insertGroupsTeachers(rowData);
                   }
 
                   List<dynamic> subjects = await readExcelFile(subject_path.text, subject_sheet.text);
@@ -431,20 +580,18 @@ class MainBody extends StatelessWidget {
                     await SubjectsData.insertSubject(rowData);
                   }
 
-                  List<dynamic> groups = await readExcelFile(group_path.text, group_sheet.text);
+                  List<dynamic> sessions = await readExcelFile(session_path.text, session_sheet.text);
                   // Loop through rows in the sheet and insert data into the SQLite database
-                  for (var i = 1; i < groups.length; i++) {
-                    var row = groups[i];
+                  for (var i = 1; i < sessions.length; i++) {
+                    var row = sessions[i];
                     Map<String, dynamic> rowData = {
-                      'group_id': row[0].value.toString(),
-                      'group_year': int.tryParse(row[1].value.toString())??0,
-                      'group_section': int.tryParse(row[2].value.toString())??0,
-                      'group_number': int.tryParse(row[3].value.toString())??0,
-                      'student_number': int.tryParse(row[4].value.toString())??0,
+                      'session_id': row[0].value.toString(),
+                      'subject_id': row[1].value.toString(),
+                      'session_type': row[2].value.toString(),
+                      'nb_of_sessions_per_week': row[3].value.toString(),
                     };
-                    await GroupsData.insertGroup(rowData);
+                    await SessionsData.insertSession(rowData);
                   }
-
                   // Show a SnackBar indicating successful upload
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(
