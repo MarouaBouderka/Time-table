@@ -82,8 +82,10 @@ class Timetable_DB {
           ''');
         myMTH.execute('''
           CREATE TABLE groups_teachers(
+            teaching_id INTEGER PRIMARY KEY AUTOINCREMENT,
             group_id TEXT,	
-            teacher_id TEXT
+            teacher_id TEXT,
+            session_id TEXT
           )
           ''');
           myMTH.execute('''

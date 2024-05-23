@@ -56,8 +56,10 @@ class GroupsTeachersData {
   static Future<List<Map<String, dynamic>>> getAllGroupsTeachers() async {
     final database = await Timetable_DB.getDatabase();
     return database.rawQuery('''SELECT 
+      groups_teachers.teaching_id,
       groups_teachers.group_id,
-      groups_teachers.teacher_id
+      groups_teachers.teacher_id,
+      groups_teachers.session_id
       FROM groups_teachers
     ''');
   }
@@ -67,8 +69,8 @@ class GroupsTeachersData {
     
     // Check if the record already exists
     final List<Map<String, dynamic>> existingRecords = await database.rawQuery(
-      "SELECT * FROM groups_teachers WHERE group_id = ? AND teacher_id = ?",
-      [row['group_id'], row['teacher_id']]
+      "SELECT * FROM groups_teachers WHERE group_id = ? AND teacher_id = ? AND session_id = ?",
+      [row['group_id'], row['teacher_id'], row['session_id']]
     );
     
     if (existingRecords.isNotEmpty) {
@@ -84,11 +86,11 @@ class GroupsTeachersData {
     );
   }
 
-  static void deleteGroupsTeachers(String id_teacher) async {
+  static void deleteGroupsTeachers(int teaching_id) async {
     final database = await Timetable_DB.getDatabase();
     await database.rawDelete(
-      "DELETE FROM groups_teachers WHERE teacher_id = ?",
-      [id_teacher],
+      "DELETE FROM groups_teachers WHERE teaching_id = ?",
+      [teaching_id],
     );
   }
 }

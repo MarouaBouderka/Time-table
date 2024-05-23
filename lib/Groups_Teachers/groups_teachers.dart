@@ -14,18 +14,17 @@ class GroupsTeachers extends StatefulWidget {
 }
 
 class _groupsTeachersState extends State<GroupsTeachers> {
-  List<Map<String, dynamic>> teacherData = [];
-  Map<String, List<String>> teachersGroups = {};
+  List<dynamic> teachersGroups = [];
 
   @override
   void initState() {
     super.initState();
-    _fetchTeachers();
+    _fetchTeachersGroups();
   }
 
-  Future<void> _fetchTeachers() async {
+  Future<void> _fetchTeachersGroups() async {
     try {
-      teacherData = await TeachersData.getTeacher();
+      teachersGroups = await GroupsTeachersData.getAllGroupsTeachers();
       setState(() {});
     } catch (e) {
       print('Error fetching subjects: $e');
@@ -63,49 +62,30 @@ class _groupsTeachersState extends State<GroupsTeachers> {
                         label: Text('Teacher Id',
                             style: TextStyle(color: Colors.green))),    
                     DataColumn(
-                        label: Text('Groups Ids',
+                        label: Text('Groups Id',
+                            style: TextStyle(color: Colors.green))),
+                    DataColumn(
+                        label: Text('Session Id',
                             style: TextStyle(color: Colors.green))),
                     DataColumn(
                         label: Text(' ',
                             style: TextStyle(color: Colors.green))),
                   ],
                   
-                  rows: teacherData.map(
-                    (teacher) => DataRow(
+                  rows: teachersGroups.map(
+                    (teaching) => DataRow(
                       cells: <DataCell>[
-                        DataCell(Text(teacher['teacher_id'], style: const TextStyle(color: Colors.white))),
-                        DataCell(
-                          FutureBuilder<List<Map<String, dynamic>>>(
-                            future: GroupsTeachersData.getAllGroupsTeachers(),
-                            builder: (context, snapshot) {
-                              if (snapshot.connectionState == ConnectionState.waiting) {
-                                return CircularProgressIndicator(); // Placeholder while loading
-                              } else if (snapshot.hasError) {
-                                return Text('Error: ${snapshot.error}');
-                              } else {
-                                // Filter working days for the current teacher
-                                List<String> groups = snapshot.data!
-                                    .where((group) => group['teacher_id'] == teacher['teacher_id'])
-                                    .map((group) => group['group_id'].toString())
-                                    .toList();
-                                
-                                if (groups.isEmpty) {
-                                  return Text('none', style: const TextStyle(color: Colors.white));
-                                } else {
-                                  return Text(groups.join(', '), style: const TextStyle(color: Colors.white));
-                                }
-                              }
-                            },
-                          ),
-                        ),
+                        DataCell(Text(teaching['teacher_id'], style: const TextStyle(color: Colors.white))),
+                        DataCell(Text(teaching['group_id'], style: const TextStyle(color: Colors.white))),
+                        DataCell(Text(teaching['session_id'], style: const TextStyle(color: Colors.white))),
                         DataCell(
                           IconButton(
                             color: Colors.white,
                             icon: Icon(Icons.delete),
                             onPressed: () {
-                              print(teacher['teacher_id']);
-                              GroupsTeachersData.deleteGroupsTeachers(teacher['teacher_id']);
-                              _fetchTeachers();
+                              print(teaching['teaching_id']);
+                              GroupsTeachersData.deleteGroupsTeachers(teaching['teaching_id']);
+                              _fetchTeachersGroups();
                             },
                           ),
                         )
@@ -121,7 +101,7 @@ class _groupsTeachersState extends State<GroupsTeachers> {
       floatingActionButton: FloatingActionButton(
         onPressed: () async {
           await teachergroupAddRowDialog(context);
-          _fetchTeachers();
+          _fetchTeachersGroups();
         },
         backgroundColor: Color.fromARGB(255, 143, 226, 148),
         child: const Icon(Icons.add,),

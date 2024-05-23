@@ -340,9 +340,13 @@ Future<void> teachergroupAddRowDialog(BuildContext context) async {
     List<String> groupIds = [' '];
     if((await GroupsData.getGroups()).map((result) => result['group_id'] as String).toList().isNotEmpty)
       groupIds = (await GroupsData.getGroups()).map((result) => result['group_id'] as String).toList();
+    List<String> sessionIds = [' '];
+    if((await SessionsData.getSessions()).map((result) => result['session_id'] as String).toList().isNotEmpty)
+      sessionIds = (await SessionsData.getSessions()).map((result) => result['session_id'] as String).toList();
     
     String? selectedteacher = teacherIds.first;
     String? selectedgroup = groupIds.first;
+    String? selectedsession = sessionIds.first;
 
     // ignore: use_build_context_synchronously
     return showDialog(
@@ -415,6 +419,7 @@ Future<void> teachergroupAddRowDialog(BuildContext context) async {
 
                   const SizedBox(height: 10),
 
+                
                   DropdownButtonFormField2<String>(
                     isExpanded: true,
                     decoration: InputDecoration(
@@ -473,6 +478,64 @@ Future<void> teachergroupAddRowDialog(BuildContext context) async {
 
                   const SizedBox(height: 10),
 
+                  DropdownButtonFormField2<String>(
+                    isExpanded: true,
+                    decoration: InputDecoration(
+                      contentPadding: const EdgeInsets.symmetric(vertical: 16),
+                      border: OutlineInputBorder(
+                        borderRadius: BorderRadius.circular(5),
+                      ),
+                    ),
+                    hint: const Text(
+                      'Session Id',
+                      style: TextStyle(fontSize: 14, color: Colors.white),
+                    ),
+                    items: sessionIds
+                        .map((item) => DropdownMenuItem<String>(
+                              value: item,
+                              child: Text(
+                                item,
+                                style: const TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 14,
+                                ),
+                              ),
+                            ))
+                        .toList(),
+                    validator: (value) {
+                      if (value == null) {
+                        return 'Please select a group.';
+                      }
+                      return null;
+                    },
+                    onChanged: (value) {
+                      selectedsession = value.toString();
+                    },
+                    onSaved: (value) {
+                      selectedsession = value.toString();
+                    },
+                    buttonStyleData: const ButtonStyleData(
+                      padding: EdgeInsets.only(right: 8),
+                    ),
+                    iconStyleData: const IconStyleData(
+                      icon: Icon(
+                        Icons.arrow_drop_down,
+                        color: Colors.white,
+                      ),
+                      iconSize: 24,
+                    ),
+                    dropdownStyleData: DropdownStyleData(
+                      decoration: BoxDecoration(
+                        borderRadius: BorderRadius.circular(15),
+                      ),
+                    ),
+                    menuItemStyleData: const MenuItemStyleData(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                    ),
+                  ),
+
+                  const SizedBox(height: 10),
+
                   Center(
                     child: ElevatedButton(
                       onPressed: () async {
@@ -488,10 +551,12 @@ Future<void> teachergroupAddRowDialog(BuildContext context) async {
                         // Retrieve values from text controllers
                         String? group_id = selectedgroup;
                         String? teacher_id = selectedteacher;
+                        String? session_id = selectedsession;
                         // Create a map representing the subject data
                         Map<String, dynamic> gt = {
                           'teacher_id': teacher_id,
                           'group_id': group_id,
+                          'session_id':session_id,
                         };
                         try{
                           await GroupsTeachersData.insertGroupsTeachers(gt);
