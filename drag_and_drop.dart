@@ -109,12 +109,12 @@ class _TimetableTableState extends State<TimetableTable> {
                       if (data != Null &&
                           data.data != Null &&
                           check_constraints(
-                              data.data, index % n_columns, cells, n_columns) &&
+                              data.data, index % n_columns, cells, n_columns,context) &&
                           check_constraints(
                               cells[index],
                               cells.indexOf(data.data) % n_columns,
                               cells,
-                              n_columns)) {
+                              n_columns,context)) {
                         print("changing ...");
                         var temp = data.data;
                         cells[cells.indexOf(data.data)] = cells[index];
@@ -140,14 +140,23 @@ class _TimetableTableState extends State<TimetableTable> {
   }
 }
 
-bool check_constraints(
-    TimetableCell data, int index, List<TimetableCell> others, int n_columns) {
+bool check_constraints(TimetableCell data, int index,
+    List<TimetableCell> others, int n_columns, BuildContext context) {
   int startOfRow = (index ~/ n_columns) * n_columns;
   for (int i = startOfRow; i < startOfRow + n_columns; i++) {
-    if (i != index &&
-        (data.teacherName == others[i].teacherName ||
-            data.roomName == others[i].roomName)) {
-      return false;
+    if (i != index) {
+      if (data.roomName == others[i].roomName) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Invalid Constraint: Rooms"),
+        ));
+        return false;
+      }
+      if (data.teacherName == others[i].teacherName) {
+        ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+          content: Text("Invalid Constraint: Teachers"),
+        ));
+        return false;
+      }
     }
   }
   return true;
