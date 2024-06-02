@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/material.dart';
 
-// Data model for timetable cell
 class TimetableCell {
   final String teacherName;
   final String subject;
@@ -15,7 +14,6 @@ class TimetableCell {
   });
 }
 
-// Widget for timetable cell
 class TimetableCellWidget extends StatelessWidget {
   final TimetableCell cell;
 
